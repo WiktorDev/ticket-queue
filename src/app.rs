@@ -80,7 +80,7 @@ pub fn App() -> Element {
                 for case in cases.into_iter() {
                     div {
                         class: format!(
-                            "bg-gray-800 bg-opacity-50 min-h-16 w-full px-4 py-6 rounded-md select-none cursor-pointer {}",
+                            "flex flex-col items-center bg-gray-800 bg-opacity-50 min-h-16 w-full px-4 py-6 rounded-md select-none cursor-pointer {}",
                             if selected_case.to_string() == case.code { "border border-green-500" } else { "" }
                         ),
                         onclick: move |event| selected_case.set(case.clone().code),
@@ -94,6 +94,8 @@ pub fn App() -> Element {
                                 "{case.description}"
                             }
                         }
+                        div { class: "w-1/4 border-t mt-3 mb-1" }
+                        span { "Oczekuje {case.awaiting} osób" }
                     }
                 }
                 div {
