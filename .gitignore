@@ -1,4 +1,7 @@
 /dist/
 /target/
 /Cargo.lock
+.cargo
+.idea
+.vscode
 assets/tailwind.css
