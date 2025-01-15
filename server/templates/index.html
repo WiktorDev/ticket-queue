@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chcialbym 6</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<style>
+    .selected-row {
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+        0%, 100% {
+            background-color: rgba(59, 130, 246, 0.2);
+        }
+        50% {
+            background-color: rgba(59, 130, 246, 0.5);
+        }
+    }
+</style>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<div class="container mx-auto px-[10vw]">
+    <h1 class="text-3xl pb-4 font-medium">Ticket System</h1>
+    <div class="overflow-x-auto">
+        <table class="table-fixed min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+            <thead class="bg-gray-800 text-white">
+            <tr class="divide-x divide-gray-300">
+                <th class="w-1/3 px-6 py-3 text-center text-sm font-medium uppercase tracking-wider">A</th>
+                <th class="w-1/3 px-6 py-3 text-center text-sm font-medium uppercase tracking-wider">B</th>
+                <th class="w-1/3 px-6 py-3 text-center text-sm font-medium uppercase tracking-wider">C</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+            <tr>
+                <td id="case-a"></td>
+                <td id="case-b"></td>
+                <td id="case-c"></td>
+            </tr>
+<!--            <tr id="case-" class="hover:bg-gray-100 divide-x divide-gray-300">-->
+<!--                <td class="px-6 py-4 text-sm text-gray-900 selected-row">A01</td>-->
+<!--                <td class="px-6 py-4 text-sm text-gray-900">A02</td>-->
+<!--                <td class="px-6 py-4 text-sm text-gray-900">B23</td>-->
+<!--                <td class="px-6 py-4 text-sm text-gray-500">C42</td>-->
+<!--            </tr>-->
+<!--            <tr class="hover:bg-gray-100 divide-x divide-gray-300">-->
+<!--                <td class="px-6 py-4 text-sm text-gray-900">A02</td>-->
+<!--                <td class="px-6 py-4 text-sm text-gray-900">B27</td>-->
+<!--                <td class="px-6 py-4 text-sm text-gray-500">C47</td>-->
+<!--            </tr>-->
+<!--            <tr class="hover:bg-gray-100 divide-x divide-gray-300">-->
+<!--                <td class="px-6 py-4 text-sm text-gray-900">A03</td>-->
+<!--                <td class="px-6 py-4 text-sm text-gray-900">B25</td>-->
+<!--                <td class="px-6 py-4 text-sm text-gray-500">C48</td>-->
+<!--            </tr>-->
+            </tbody>
+        </table>
+    </div>
+    <div class="mt-4 p-4 bg-white shadow rounded-lg text-center">
+        <p class="text-lg font-medium text-gray-800">Numer sprawy: <span id="caseId" class="text-blue-500"></span> Pokój NR. <span id="room" class="text-blue-500"></span></p>
+    </div>
+</div>
+<script>
+    fetch('/queue')
+        .then(response => response.json())
+        .then(data => data.forEach(it => process(it)))
+        .catch(err => console.log(err))
+
+    const socket = new WebSocket("/ws")
+    socket.addEventListener("message", (event) => process(event.data));
+
+    function process(it) {
+        const data = it.split(':')
+        if (data.length !== 2) return
+
+        if (data[0] === 'add') addCase(data[1])
+        if (data[0] === 'remove') removeCase(data[1])
+    }
+
+    function addCase(value) {
+        const caseCode = value[0].toLowerCase()
+        const td = document.getElementById(`case-${caseCode}`)
+        const div = document.createElement('div')
+        div.setAttribute("id", value)
+        div.classList.add(..."hover:bg-gray-100 divide-x divide-gray-300 px-6 py-4 text-sm text-gray-900".split(" "))
+        div.append(document.createTextNode(value))
+        td.appendChild(div)
+    }
+    function removeCase(value) {
+        const div = document.getElementById(value);
+        if (!div) return
+        div.classList.add('selected-row')
+        setTimeout(() => {
+            div.parentNode.removeChild(div);
+        }, 4000)
+
+        const caseId = document.getElementById('caseId')
+        const room = document.getElementById('room')
+
+        caseId.innerText = value
+        room.innerText = "1"
+    }
+</script>
+</body>
+</html>
+
